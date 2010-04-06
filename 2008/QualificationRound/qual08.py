@@ -4,6 +4,11 @@ from optparse import OptionParser
 # from pprint import pprint
 
 def main():
+    """Main function code. Implementing:
+        1. parsig args (-i, --in-file)
+        2. iterating and transorming input data (results stored in table)
+        3. printing out results in required format
+    """
     parser = OptionParser(usage="usage: %prog [options] arg") 
     parser.add_option("-i", "--in-file", dest="in_filename", help="provide input data by specifing filename")
     (options, args) = parser.parse_args() 
@@ -11,8 +16,7 @@ def main():
         parser.print_usage()
         exit(0)
     results = []    
-    next_case = gen_next_case(options.in_filename)
-    for engines, phrases in next_case:
+    for engines, phrases in gen_next_case(options.in_filename):
         engine_in_use = None
         score = 0
         if len(phrases) == 0:
@@ -29,6 +33,14 @@ def main():
         print "Case #%i: %i" % (i+1, result)
 
 def suggest(engines, phrases, exclude=False):
+    """Returns the best engine to be used basing on the metric
+    MAX( phrases[i:].index(engine) ). Where:
+        - `i` is the curent phrase index.
+        - `engine` is any engine apart the one that is excluded
+    
+    In case exist engines that do are not matched by any phrase
+    the first possible engine becomes returned.
+    """
     if exclude:
         engines = engines.difference(exclude)
     not_used_engines = engines.difference(set(phrases))
@@ -43,6 +55,8 @@ def suggest(engines, phrases, exclude=False):
             return engine   
 
 def gen_next_case(filename):
+    """Wrap the imput file format and return engines, phrases 
+    pairs. It uses generator to return them one by one."""
     next_line = lambda f: f.readline().rstrip()
     with open(filename, "r") as f:
         num_of_cases = int(next_line(f))
@@ -53,21 +67,7 @@ def gen_next_case(filename):
             phrases_lines = int(next_line(f))
             phrases = [next_line(f) for i in xrange(phrases_lines)]
             engines_lines = next_line(f)
-            yield engines, phrases
-                     
-class DataFile(object):
-    def __init__(self, name):
-        self.file = open(name, "r")
-        self.num_of_cases = int(self.next_line()) 
-    def next_line(self):
-        return self.file.readline().rstrip('\r\n')
-    def get_next_case(self):
-        while True:
-            engines_lines = int(self.next_line())
-            engines = set([self.next_line() for i in xrange(engines_lines)])
-            phrases_lines = int(self.next_line())
-            phrases = [self.next_line() for i in xrange(phrases_lines)]
-            yield [engines, phrases]            
+            yield engines, phrases          
            
 if __name__ == "__main__":
     main() 
