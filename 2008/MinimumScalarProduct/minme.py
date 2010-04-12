@@ -55,8 +55,8 @@ def gen_next_case(filename):
         next_case_size = next_line(f)
         while next_case_size:
             case_size = int(next_case_size)
-            v1 = map(lambda x: int(x), next_line(f).split(' '))           
-            v2 = map(lambda x: int(x), next_line(f).split(' '))           
+            v1 = [int(x) for x in next_line(f).split(' ')]           
+            v2 = [int(x) for x in next_line(f).split(' ')]           
             next_case_size = next_line(f)
             yield v1, v2, case_size
 
