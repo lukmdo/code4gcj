@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from optparse import OptionParser
-# from pprint import pprint
 
 def main():
     """Main function code. Implementing:
