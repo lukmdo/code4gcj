@@ -4,7 +4,15 @@ from optparse import OptionParser
 from math import log
 
 def encode_decimal(num, alphabet):
-    pass
+    seqence = str()
+    weight = len(alphabet)
+    sequence_length = int(log(num, weight)) + 1
+    for i in reversed(xrange(sequence_length)):
+        weight_pow_i = weight**i
+        d = num / weight_pow_i
+        seqence += alphabet[d]
+        num = num % weight_pow_i
+    return seqence
 
 def decode_to_decimal(seqence, alphabet):
     decimal = 0
@@ -32,7 +40,7 @@ def main():
     for num, l_from, l_to in gen_next_case(options.in_filename):
         results.append(translate(num, l_from, l_to))
     for i, result in enumerate(results):    
-        print "Case #%i: %i" % (i+1, result)
+        print "Case #%i: %s" % (i+1, result)
 
 def gen_next_case(filename):
     """Wrap the imput file format and return a list of
@@ -45,9 +53,13 @@ def gen_next_case(filename):
         num_of_cases = int(next_line(f))
         next_num, next_l_from, next_l_to = next_line(f).split(' ')
         while next_num:
-            num, l_from, l_to = next_num, next_l_from.split(), next_l_to.split()
-            next_num, next_l_form, next_l_to = next_line(f).split(' ')
-            yield source_num, l_from, l_to
+            num, l_from, l_to = next_num, next_l_from, next_l_to
+            next_one = next_line(f)
+            if next_one:
+                next_num, next_l_from, next_l_to = next_one.split(' ')
+            else:
+                next_num = None
+            yield num, l_from, l_to
 
 if __name__ == "__main__":
     main()
