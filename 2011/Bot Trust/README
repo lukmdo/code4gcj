@@ -1,0 +1,25 @@
+A-small-attempt0.out was wrong I forgot about taking abosolute value:
+
+Instead of:
+
+  def move_on(self, max_hops):
+    dist = self.get_next_click_pos() - self.pos
+    hops = min(dist, max_hops, key=abs)
+    if dist < 0:
+      self.pos -= hops
+    else:
+      self.pos += hops 
+
+Should be:
+
+  def move_on(self, max_hops):
+    dist = self.get_next_click_pos() - self.pos
+    hops = abs(min(dist, max_hops, key=abs))
+    if dist < 0:
+      self.pos -= hops
+    else:
+      self.pos += hops 
+
+
+
+
