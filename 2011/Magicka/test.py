@@ -41,9 +41,10 @@ class Test_GCJ(unittest.TestCase):
       [],
     ]                                         
 
-  def test_will_turn_on(self):
+  def test_solve_case(self):
     for i, data in enumerate(self.got):
-      self.failUnlessEqual(bot.solve_case(int(*data)), self.expected[i], "Test %s for %s" % (i, data))        
+      self.failUnlessEqual(magicka.solve_case(*data), self.expected[i], 
+        "Test %s for %s returned %s instead of %s" % (i, data, magicka.solve_case(*data), self.expected[i]))        
 
 if __name__ == '__main__':
   unittest.main()
