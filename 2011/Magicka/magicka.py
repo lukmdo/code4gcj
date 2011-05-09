@@ -16,7 +16,7 @@ def play_magicka(c_num, d_num, l_num, c, d, l):
       for n, xchar in enumerate(l[:i]):
         for k in (xchar, l[i]), (l[i], xchar):
           if d.has_key(k):
-            l = l[:n] + l[i+1:]                                     
+            l = l[i+1:]                                     
             return play_magicka(c_num, d_num, l_num, c, d, l) 
   return l
     
