@@ -1,7 +1,8 @@
 Code for GCJ (Google Code Jam) |status|
 =======================================
 
-.. |status| image:: http://stillmaintained.com/ssspiochld/code4gcj.png 
+.. |status| image:: http://stillmaintained.com/ssspiochld/code4gcj.png
+   :target: http://stillmaintained.com/ssspiochld/code4gcj
 
 This is code repo for the competition organised by Google Inc. called `Google Code Jam`_
 
