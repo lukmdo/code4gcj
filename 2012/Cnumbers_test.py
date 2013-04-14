@@ -2,7 +2,6 @@ import unittest
 from Cnumbers import get_recycled_num_count
 
 
-
 class TestFoo(unittest.TestCase):
     def test_case1(self):
         recycled_count = get_recycled_num_count(1, 9)
