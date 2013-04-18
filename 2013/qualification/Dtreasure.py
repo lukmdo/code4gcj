@@ -1,53 +1,77 @@
-def _open_combinations(chests_opened, chests, keys):
-    keys_set = set(keys)
-    chests_opened_set = set(chests_opened)
-    combinations = []
+#!/usr/bin/python3
+"""
+python Dtreasure.py < IN-FILE.in > OUT-FILE.out
+python -u Dtreasure.py < IN-FILE.in | tee OUT-FILE.out
+"""
+from collections import Counter
 
+
+def _can_open_all(chests, keys):
+    if not chests:
+        return True
+    # eulerian path: code.google.com/codejam/contest/2270488/dashboard#s=a&a=3
+
+    # enough_keys_by_type
+    all_keys = list(keys)
+    chest_open_keys = []
     for chest in chests:
         chest_num, open_key, *found_keys = chest
-        if chest_num in chests_opened_set:
-            continue
-        if open_key in keys_set:
-            new_chests_opened = list(chests_opened)
-            new_chests_opened.append(chest_num)
+        all_keys.extend(found_keys)
+        chest_open_keys.append(open_key)
+    all_keys_count = Counter(all_keys)
+    chest_open_keys_count = Counter(chest_open_keys)
+    enough_keys_by_type = all(
+        v <= all_keys_count.get(k, 0) for k, v in chest_open_keys_count.items())
+    if not enough_keys_by_type:
+        return False
 
-            new_keys = list(keys)
-            new_keys.remove(open_key)  # any key of type open_key
-            new_keys.extend(found_keys)
+    # each chest_open_key type can be reached
+    chest_open_keys_set = set(chest_open_keys)
+    seen_keys_set = set(keys)
+    if chest_open_keys_set.issubset(seen_keys_set):
+        return True
+    can_open_and_non_empty = lambda c: c[2:] and c[1] in seen_keys_set
+    other_chests = set(chests)
 
-            combination = (tuple(new_chests_opened), tuple(new_keys))
-            combinations.append(combination)
+    bfs_queue = set(filter(can_open_and_non_empty, chests))
+    while bfs_queue:
+        other_chests -= bfs_queue
+        chest = bfs_queue.pop()
+        seen_keys_set |= set(chest[2:])
+        if chest_open_keys_set.issubset(seen_keys_set):
+            return True
+        child_chests = filter(can_open_and_non_empty, other_chests)
+        bfs_queue |= set(child_chests)
 
-    return combinations
+    return False
 
 
 def get_open_combination(init_keys, chests):
-    combinations = [_open_combinations([], chests, init_keys)]
-    # import pdb; pdb.set_trace()
-
-    for step in range(1, len(chests)):
-        if len(combinations) < step:
-            break  # no combinations from prev step
-        last_combinations = combinations[-1]
-        print(len(combinations))
-        print(len(last_combinations))
-
-        for combination in last_combinations:
-            new_combinations = _open_combinations(combination[0], chests, combination[1])
-            if len(combinations) <= step:
-                combinations.append([])
-            combinations[step].extend(new_combinations)
-
-        last_combinations.clear()  # free some memory
-
-    if len(combinations) < len(chests):
+    if not _can_open_all(chests, init_keys):
         return None
-    options = [c[0] for c in combinations[-1]]
-    if not options:
-        return None
-    best_combination = sorted(options)[0]
 
-    return tuple(best_combination)
+    keys = list(init_keys)
+
+    combination = tuple()
+    for _ in range(len(chests)):
+        temp_keys = list(keys)
+        temp_chests = list(chests)
+        for i, chest in enumerate(chests):
+            chest_num, open_key, *found_keys = chest
+            if open_key not in temp_keys:
+                continue
+            new_chests = list(temp_chests)
+            new_chests.pop(i)
+            new_keys = list(temp_keys)
+            new_keys.remove(open_key)
+            new_keys.extend(found_keys)
+            if _can_open_all(new_chests, new_keys):
+                keys = new_keys
+                chests = new_chests
+                combination += (chest_num,)
+                break
+
+    return combination
 
 
 def solve(num_cases):
@@ -65,13 +89,11 @@ def solve(num_cases):
             chest = [chest_num, open_key] + keys_in_chest
             chests.append(tuple(chest))
 
-        solved = get_open_combination(init_keys, chests) or 'IMPOSSIBLE'
+        solved = get_open_combination(init_keys, chests)
+        solved = ' '.join(str(n) for n in solved) if solved else 'IMPOSSIBLE'
         print('Case #{case_num}: {solved}'.format(
             case_num=case_num, solved=solved))
 
 if __name__ == '__main__':
-    import sys
-    with open(sys.argv[-1], 'r') as f:
-        input = f.readline
-        num_cases = int(input())
-        solve(num_cases)
+    num_cases = int(input())
+    solve(num_cases)
