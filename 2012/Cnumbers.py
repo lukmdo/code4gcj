@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 python Cnumbers.py < IN-FILE.in > OUT-FILE.out
-python Cnumbers.py < IN-FILE.in | tee OUT-FILE.out
+python -u Cnumbers.py < IN-FILE.in | tee OUT-FILE.out
 """
 
 
