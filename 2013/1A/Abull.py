@@ -3,23 +3,25 @@
 python Abull.py < IN-FILE.in > OUT-FILE.out
 python -u Abull.py < IN-FILE.in | tee OUT-FILE.out
 """
-import math
 
 
 def bisect_le(yfunc, y, r):
-    """from https://gist.github.com/lukmdo/5855284"""
-    lo, hi = 0, len(r)
-    if callable(y):
-        yfunc2 = y
-    else:
-        yfunc2 = lambda x, y=y: y
+    """
+    Return last index from range `r` which:
+    yfunc(r[i]) <= y || None
 
+    :param yfunc: probed function as one arg callable
+    :param y: value
+    :param r: range with non-descending values
+    :return: found value or None
+    """
+    lo, hi = 0, len(r)
     found = None
 
     while lo < hi:
         mid = (lo + hi) // 2
 
-        if yfunc(r[mid]) <= yfunc2(r[mid]):
+        if yfunc(r[mid]) <= y:
             found = mid
             lo = mid + 1
         else:

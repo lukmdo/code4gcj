@@ -12,7 +12,8 @@ Nice, but what if you want use dynamic yfun2 insted of static y:
 >>> import math
 >>> yfun1 = lambda x: 10 ** ((x-20)/10)
 >>> yfun2 = lambda x: x * math.log(x)
->>>> bisect_le(yfun1, yfun2, range(10**3))
+>>> yfun  = lambda x: yfun1(x) - yfun2(x)
+>>>> bisect_le(yfun, 0, range(10**3))
 41
 
 Alternative
@@ -24,13 +25,6 @@ then pure bisect would be back in use:
 >>> from bisect import bisect
 >>> bisect(yr, t)
 49
-but still not good if `t` is dynamic like our `yfun2` - what feels natural:
->>> stop = 10**3
->>> yr1 = yrange(stop, y=yfun1)
->>> yr2 = yrange(stop, y=yfun2)
->>> bisect(yr1, yr2)
-41
-Nice but not with bisect-of-today (second arg can not be a callable)
 
 Note:
 - (Range class)[https://github.com/psycopg/psycopg2/blob/master/lib/_range.py]
@@ -49,25 +43,19 @@ would have to (re)implement __getitem__(self, i): return self.yfun(i)
 def bisect_ge(func, y, r):
     """
     Return first index from range `r` which:
-    yfunc(r[i]) >= y || yfunc(r[i]) >= y(r[i]) || None
+    yfunc(r[i]) >= y || None
 
     :param yfunc: probed function as one arg callable
-    :param y: value or one argument callable
+    :param y: value
     :param r: range with non-descending values
     :return: found value or None
     """
     lo, hi = 0, len(r)
-    if callable(y):
-        yfunc2 = y
-    else:
-        yfunc2 = lambda x, y=y: y
-
     found = None
 
     while lo < hi:
         mid = (lo + hi) // 2
-
-        if func(r[mid]) >= yfunc2(r[mid]):
+        if func(r[mid]) >= y:
             found = True
             hi = mid
         else:
@@ -79,25 +67,19 @@ def bisect_ge(func, y, r):
 def bisect_gt(yfunc, y, r):
     """
     Return first index from range `r` which:
-    yfunc(r[i]) > y || yfunc(r[i]) > y(r[i]) || None
+    yfunc(r[i]) > y || None
 
     :param yfunc: probed function as one arg callable
-    :param y: value or one argument callable
+    :param y: value
     :param r: range with non-descending values
     :return: found value or None
     """
     lo, hi = 0, len(r)
-    if callable(y):
-        yfunc2 = y
-    else:
-        yfunc2 = lambda x, y=y: y
-
     found = None
 
     while lo < hi:
         mid = (lo + hi) // 2
-
-        if yfunc(r[mid]) > yfunc2(r[mid]):
+        if yfunc(r[mid]) > y:
             found = True
             hi = mid
         else:
@@ -109,25 +91,19 @@ def bisect_gt(yfunc, y, r):
 def bisect_lt(yfunc, y, r):
     """
     Return last index from range `r` which:
-    yfunc(r[i]) < y || yfunc(r[i]) < y(r[i]) || None
+    yfunc(r[i]) < y || None
 
     :param yfunc: probed function as one arg callable
-    :param y: value or one argument callable
+    :param y: value
     :param r: range with non-descending values
     :return: found value or None
     """
     lo, hi = 0, len(r)
-    if callable(y):
-        yfunc2 = y
-    else:
-        yfunc2 = lambda x, y=y: y
-
     found = None
 
     while lo < hi:
         mid = (lo + hi) // 2
-
-        if yfunc(r[mid]) < yfunc2(r[mid]):
+        if yfunc(r[mid]) < y:
             found = mid
             lo = mid + 1
         else:
@@ -139,25 +115,20 @@ def bisect_lt(yfunc, y, r):
 def bisect_le(yfunc, y, r):
     """
     Return last index from range `r` which:
-    yfunc(r[i]) <= y || yfunc(r[i]) <= y(r[i]) || None
+    yfunc(r[i]) <= y || None
 
     :param yfunc: probed function as one arg callable
-    :param y: value or one argument callable
+    :param y: value
     :param r: range with non-descending values
     :return: found value or None
     """
     lo, hi = 0, len(r)
-    if callable(y):
-        yfunc2 = y
-    else:
-        yfunc2 = lambda x, y=y: y
-
     found = None
 
     while lo < hi:
         mid = (lo + hi) // 2
 
-        if yfunc(r[mid]) <= yfunc2(r[mid]):
+        if yfunc(r[mid]) <= y:
             found = mid
             lo = mid + 1
         else:
