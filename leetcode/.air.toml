@@ -1,0 +1,11 @@
+# run with:
+#   F="XXX.go" air -c air.toml
+
+root = "."
+#tmp_dir = "tmp"
+
+[build]
+#exclude_regex = []
+cmd = "go build -o ./tmp/main ./$F"
+#full_bin = "go test -v"
+stop_on_error = true
